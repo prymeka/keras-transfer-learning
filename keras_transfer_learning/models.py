@@ -40,12 +40,6 @@ def unfreeze_model(model: Model, base_model: Functional, n: int, learning_rate: 
     Unfreeze the last `n` layers in the base model. 
     """
     # unfreeze the top `n` layers while leaving BatchNormalization layers frozen
-    for layer in base_model.layers[-200:]:
+    for layer in base_model.layers[-n:]:
         if not isinstance(layer, layers.BatchNormalization):
             layer.trainable = True
-    # re-compile
-    model.compile(
-        optimizer=Adam(learning_rate=learning_rate),
-        loss='categorical_crossentropy',
-        metrics=['accuracy']
-    )
