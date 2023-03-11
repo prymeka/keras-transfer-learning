@@ -35,7 +35,7 @@ def build_model(
     return model, base_model
 
 
-def unfreeze_model(model: Model, base_model: Functional, n: int, learning_rate: float) -> None:
+def unfreeze_model(model: Model, base_model: Functional, n: int) -> None:
     """ 
     Unfreeze the last `n` layers in the base model. 
     """
