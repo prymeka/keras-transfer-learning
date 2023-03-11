@@ -1,17 +1,18 @@
-import tensorflow as tf
-import keras
 from keras.models import Model, Sequential
 from keras import layers
 from keras.optimizer_v2.adam import Adam
+from tensorflow.python.keras.engine.functional import Functional # for correct type hints
 
 from typing import List, Tuple, Union
 
-# for correct type hints
-from tensorflow.python.keras.engine.functional import Functional
+from .keras_models import get_base_model
 
-from keras_models import get_base_model
-
-def build_model(model_name: str, input_shape: Tuple[int, int], top_layers: List[layers.Layer], lr: float) -> Tuple[Sequential, Functional]:
+def build_model(
+    model_name: str, 
+    input_shape: Union[Tuple[int, int], Tuple[int, int, int]], 
+    top_layers: List[layers.Layer], 
+    lr: float
+    ) -> Tuple[Sequential, Functional]:
     """
     Create a model for transfer learning using Keras pre-trained model.
     
@@ -19,7 +20,7 @@ def build_model(model_name: str, input_shape: Tuple[int, int], top_layers: List[
     layers cannot be accessed through the main model, hence a reference to it 
     is also returned. 
     """ 
-    # expand the input shape 
+    # expand the input shape
     input_shape = (*input_shape, 3)
     # get the base, pre-trained model
     base_model, preprocess_input = get_base_model(model_name, input_shape)
