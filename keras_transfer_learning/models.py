@@ -1,27 +1,28 @@
 from keras.models import Model, Sequential
 from keras import layers
 from keras.optimizer_v2.adam import Adam
-from tensorflow.python.keras.engine.functional import Functional # for correct type hints
+# for correct type hints
+from tensorflow.python.keras.engine.functional import Functional
 
 from typing import List, Tuple, Union
 
 from .keras_models import get_base_model
 
+
 def build_model(
-    model_name: str, 
-    input_shape: Union[Tuple[int, int], Tuple[int, int, int]], 
-    top_layers: List[layers.Layer], 
-    lr: float
-    ) -> Tuple[Sequential, Functional]:
+    model_name: str,
+    input_shape: Union[Tuple[int, int], Tuple[int, int, int]],
+    top_layers: List[layers.Layer],
+    learning_rate: float
+) -> Tuple[Sequential, Functional]:
     """
     Create a model for transfer learning using Keras pre-trained model.
-    
-    Since, the base model is inside a wrapper and its individual, internal 
-    layers cannot be accessed through the main model, hence a reference to it 
-    is also returned. 
-    """ 
-    # expand the input shape
-    input_shape = (*input_shape, 3)
+
+    Since, the base model is inside a wrapper within the main model, internal 
+    layers cannot be accessed through the main model API. Reference to the 
+    base model is also returned to allow its layers to be unforzen. 
+    """
+    input_shape = input_shape if len(input_shape) == 3 else (*input_shape, 3)
     # get the base, pre-trained model
     base_model, preprocess_input = get_base_model(model_name, input_shape)
     for layer in base_model.layers:
@@ -34,25 +35,25 @@ def build_model(
         model.add(layer)
     # compile
     model.compile(
-        optimizer=Adam(learning_rate=lr),
-        loss='categorical_crossentropy', 
+        optimizer=Adam(learning_rate=learning_rate),
+        loss='categorical_crossentropy',
         metrics=['accuracy']
     )
-    
+
     return model, base_model
 
 
-def unfreeze_model(model: Model, base_model: Functional, n: int, lr: float) -> None:
+def unfreeze_model(model: Model, base_model: Functional, n: int, learning_rate: float) -> None:
     """ 
     Unfreeze the last `n` layers in the base model. 
-    """ 
-    # unfreeze the top `num_layers_unfreeze` layers while leaving BatchNorm layers frozen
+    """
+    # unfreeze the top `n` layers while leaving BatchNormalization layers frozen
     for layer in base_model.layers[-200:]:
         if not isinstance(layer, layers.BatchNormalization):
             layer.trainable = True
     # re-compile
     model.compile(
-        optimizer=Adam(learning_rate=lr), 
-        loss='categorical_crossentropy', 
+        optimizer=Adam(learning_rate=learning_rate),
+        loss='categorical_crossentropy',
         metrics=['accuracy']
     )

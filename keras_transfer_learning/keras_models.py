@@ -10,7 +10,7 @@ def get_base_model(
     input_shape: Union[Tuple[float, float], Tuple[float, float, float]]
 ) -> Tuple[Model, Callable[[tf.Tensor], tf.Tensor]]:
     """
-    Load one of the pre-trained keras models and corresponding function to 
+    Load one of the pre-trained Keras models and corresponding function to 
     preprocess input data (note: not all models available in keras are 
     implemented).
     """
