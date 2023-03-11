@@ -4,7 +4,7 @@ from keras.optimizer_v2.adam import Adam
 # for correct type hints
 from tensorflow.python.keras.engine.functional import Functional
 
-from typing import List, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from .keras_models import get_base_model
 
@@ -13,7 +13,8 @@ def build_model(
     model_name: str,
     input_shape: Union[Tuple[int, int], Tuple[int, int, int]],
     top_layers: List[layers.Layer],
-    learning_rate: float
+    optimizer: Any,
+    learning_rate: Optional[float] = None
 ) -> Tuple[Sequential, Functional]:
     """
     Create a model for transfer learning using Keras pre-trained model.
@@ -34,8 +35,12 @@ def build_model(
     for layer in top_layers:
         model.add(layer)
     # compile
+    opt = (
+        optimizer if learning_rate is None
+        else optimizer(learning_rate=learning_rate)
+    )
     model.compile(
-        optimizer=Adam(learning_rate=learning_rate),
+        optimizer=opt,
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
