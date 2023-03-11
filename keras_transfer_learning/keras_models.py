@@ -14,11 +14,11 @@ def get_base_model(
     preprocess input data (note: not all models available in keras are 
     implemented).
     """
-    kwargs = {
-        include_top: False,
-        weights: 'imagenet',
-        input_shape:  input_shape if len(input_shape) == 3 else (*input_shape, 3),
-    }
+    kwargs = dict(
+        include_top=False,
+        weights='imagenet',
+        input_shape=input_shape if len(input_shape) == 3 else (*input_shape, 3),
+    )
     model_name = model_name.lower()
 
     if model_name == 'xception':
